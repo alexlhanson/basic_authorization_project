@@ -7,7 +7,6 @@ import User from './user';
 const router = express.Router();
 
 router.post('/register', (req, res, next) => {
-  console.log(req.body);
   let user = new User(req.body);
   user.save()
     .then(user => res.send(user.generateToken()))
