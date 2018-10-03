@@ -1,21 +1,111 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Auth Test</title>
-    </head>
-    <body>
-        <main>
-            <form action="http://localhost:3000/signup" method="POST">
-                <label>
-                Username: <input name="username">
-                </label>
+<html lang="en">
 
-                <label>
-                    Password: <input name="password" type="password" />
-                </label>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>OAUTH</title>
+</head>
 
-                <input type="submit" value="Create User" />
+<body>
+    <main>
+        Access Token: <span id="token"></span>
+        <hr>
+
+        <div id="auth">
+            <form id="register">
+                <h2>Register</h2>
+                <label for="user-name">User Name:</label>
+                <input type="text" name="user-name" autocomplete="off">
+                <label for="password">Password:</label>
+                <input type="password" name="password" autocomplete="off">
+                <input type="submit" value="Create User">
             </form>
-        </main>
-    </body>
+
+            <form id="signin">
+                <h2>Signin</h2>
+                <label for="user-name">User Name:</label>
+                <input type="text" name="user-name" autocomplete="off">
+                <label for="password">Password:</label>
+                <input type="password" name="password" autocomplete="off">
+                <input type="submit" value="Sign in">
+            </form>
+        </div>
+
+        <div id="githubAuth">
+
+
+        </div>
+
+    </main>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/3.8.3/superagent.min.js"></script>
+
+    <script>
+
+        //User Registration
+        $('#register').on('submit', function (e) {
+            e.preventDefault();
+            let username = $(this).find('[name=user-name]').val();
+            let password = $(this).find('[name=password]').val();
+            let postData = { username, password }
+
+            superagent.post('http://localhost:3000/register')
+                .send(postData)
+                .then(response => {
+                    $('#token').text(response.text);
+                    $('#rugby-stats').show();
+                    $('#auth').hide();
+                })
+        });
+
+        //User Signin
+        $('#signin').on('submit', function (e) {
+            e.preventDefault();
+            let username = $(this).find('[name=user-name]').val();
+            let password = $(this).find('[name=password]').val();
+            let authString = btoa(`${username}:${password}`);
+
+            superagent.get('http://localhost:3000/signin')
+                .set('Basic ' + authString)
+                .then(response => {
+                    $('#token').text(response.text);
+                    $('#rugby-stats').fadeIn();
+                    $('#auth').fadeOut();
+                })
+        });
+
+        /********************************************************************************
+        *         player crud api                                                       *
+        ********************************************************************************/
+
+        $('#rugby-get').on('submit', function (e) {
+            e.preventDefault();
+            let id = $(this).find('[name=player-id]').val();
+
+            superagent.get('http://localhost:3000/auth/player/get/:id')
+                .set("Authorization", "Bearer " + token)
+                .send({ player: `${id}` })
+                .then(response => {
+                    $('#get-player').text(response);
+                })
+        })
+
+        $('#rugby-delete').on('submit', function (e) {
+            e.preventDefault();
+            let id = $(this).find('[name=player-id]').val();
+
+            superagent.delete('http://localhost:3000/auth/player/delete/:id')
+                .set("Authorization", "Bearer " + token)
+                .send({ player: `${id}` })
+                .then(response => {
+                    $('#get-player').text(response);
+                })
+        })
+
+    </script>
+</body>
+
 </html>
