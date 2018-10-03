@@ -9,7 +9,7 @@ let authenticator = (req, res, next) => {
     User.authenticate(auth)
       .then(user => {
         if (!user) {
-          throw new Error('no username found');
+          throw new Error('401 ERROR: no username found');
         } else {
           req.token = user.generateToken();
           next();

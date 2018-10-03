@@ -6,11 +6,13 @@ import jwt from 'jsonwebtoken';
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
+  email: {type: String, required:true, unique:true},
   password: { type: String, required: true },
 });
 
 userSchema.pre('save', function (next) {
-  bcrypt.hash(this.password, 19)
+  console.log('save prehook');
+  bcrypt.hash(this.password, 5)
     .then(hashed => {
       this.password = hashed;
 

@@ -10,7 +10,7 @@
 
 <body>
     <main>
-        Access Token: <span id="token"></span>
+        Response Text: <span id="token"></span>
         <hr>
 
         <div id="auth">
@@ -20,6 +20,8 @@
                 <input type="text" name="user-name" autocomplete="off">
                 <label for="password">Password:</label>
                 <input type="password" name="password" autocomplete="off">
+                <label for="email">Email:</label>
+                <input type="text" name="email">
                 <input type="submit" value="Create User">
             </form>
 
@@ -50,14 +52,13 @@
             e.preventDefault();
             let username = $(this).find('[name=user-name]').val();
             let password = $(this).find('[name=password]').val();
-            let postData = { username, password }
+            let email = $(this).find('[name=email]').val();
+            let postData = { username, email, password }
 
             superagent.post('http://localhost:3000/register')
                 .send(postData)
                 .then(response => {
                     $('#token').text(response.text);
-                    $('#rugby-stats').show();
-                    $('#auth').hide();
                 })
         });
 
@@ -69,41 +70,11 @@
             let authString = btoa(`${username}:${password}`);
 
             superagent.get('http://localhost:3000/signin')
-                .set('Basic ' + authString)
+                .set('Authorization', 'Basic ' + authString)
                 .then(response => {
                     $('#token').text(response.text);
-                    $('#rugby-stats').fadeIn();
-                    $('#auth').fadeOut();
                 })
         });
-
-        /********************************************************************************
-        *         player crud api                                                       *
-        ********************************************************************************/
-
-        $('#rugby-get').on('submit', function (e) {
-            e.preventDefault();
-            let id = $(this).find('[name=player-id]').val();
-
-            superagent.get('http://localhost:3000/auth/player/get/:id')
-                .set("Authorization", "Bearer " + token)
-                .send({ player: `${id}` })
-                .then(response => {
-                    $('#get-player').text(response);
-                })
-        })
-
-        $('#rugby-delete').on('submit', function (e) {
-            e.preventDefault();
-            let id = $(this).find('[name=player-id]').val();
-
-            superagent.delete('http://localhost:3000/auth/player/delete/:id')
-                .set("Authorization", "Bearer " + token)
-                .send({ player: `${id}` })
-                .then(response => {
-                    $('#get-player').text(response);
-                })
-        })
 
     </script>
 </body>
